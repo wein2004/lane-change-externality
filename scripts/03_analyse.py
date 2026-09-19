@@ -28,6 +28,10 @@ RNG_SEED = 20260919
 N_BOOT = 5000
 
 # Labels must match scripts/02_detect_events.py::attach_regime.
+# Must mirror scripts/02_detect_events.py.
+PRE_START_FRAMES = -40
+POST_FRAMES = 100
+
 REGIMES = ["heavy", "light"]
 REGIME_LABEL = {"heavy": "Heavy congestion (<25 km/h)",
                 "light": "Lighter traffic (>=25 km/h)"}
@@ -81,6 +85,24 @@ def fmt_ci(d: dict, unit: str = "km/h") -> str:
     return f"{d['diff']:+.2f} {unit}  (95% CI {d['lo']:+.2f} .. {d['hi']:+.2f}), n={d['n_a']} vs {d['n_b']}"
 
 
+def net_delay_seconds(profiles, baseline_kmh, post_start: int, post_end: int):
+    """Seconds of delay accumulated over the post-event window.
+
+    `profiles` are speeds normalised to each vehicle's own pre-event baseline.
+    Integrating (1 - profile) gives the distance not travelled relative to
+    holding the baseline speed; dividing by the baseline speed converts that
+    distance into seconds of delay.
+
+    This is deliberately separate from `drop_kmh`. `drop_kmh` is the depth of
+    the dip - a tail statistic. This is its area. A sharp but brief dip can be
+    highly significant on one and indistinguishable from zero on the other, and
+    reporting only the first would overstate what the manoeuvre actually costs.
+    """
+    deficit = 1.0 - profiles[:, post_start:post_end]
+    metres = (deficit * (baseline_kmh[:, None] / 3.6) * ngsim.FRAME_SECONDS).sum(axis=1)
+    return metres / (baseline_kmh / 3.6)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--processed", default="data/processed")
@@ -92,7 +114,10 @@ def main() -> int:
 
     # Motorcycles are a negligible and behaviourally distinct class; drop them
     # so "car vs truck" means what it says.
-    events = events[events["v_class"].isin([ngsim.CLASS_AUTO, ngsim.CLASS_TRUCK])]
+    keep_mask = events["v_class"].isin(
+        [ngsim.CLASS_AUTO, ngsim.CLASS_TRUCK]
+    ).to_numpy()
+    events = events[keep_mask].reset_index(drop=True)
 
     out: dict = {"n_events": int(len(events)), "n_controls": int(len(controls))}
     md: list[str] = [
@@ -164,6 +189,47 @@ def main() -> int:
                 f"{num(d['mean'])} | {num(r['median'])} |"
             )
     md.append("")
+
+    # -------------------------------------------------- net delay ---------
+    # How much time does the follower actually lose, not just how deep is the dip?
+    prof_e = p / "events_profiles.npy"
+    prof_c = p / "controls_profiles.npy"
+    if prof_e.exists() and prof_c.exists():
+        import numpy as _np
+
+        Pe, Pc = _np.load(prof_e), _np.load(prof_c)
+        Pe = Pe[keep_mask]
+        t0 = -PRE_START_FRAMES
+        de = net_delay_seconds(Pe, events["baseline_kmh"].to_numpy(), t0, t0 + POST_FRAMES)
+        dc = net_delay_seconds(
+            Pc, controls["baseline_kmh"].to_numpy(), t0, t0 + POST_FRAMES
+        )
+        nd = boot_mean_diff(de, dc)
+        out["net_delay_seconds"] = nd
+        md += [
+            "## How much time does the follower actually lose?",
+            "",
+            "`drop_kmh` above is the *depth* of the speed dip. This is its *area* —",
+            "seconds of delay accumulated over the 10 s after the manoeuvre,",
+            "relative to holding the pre-event baseline speed.",
+            "",
+            f"- Excess delay attributable to the lane change: **{fmt_ci(nd, 's')}**",
+            "",
+        ]
+        if not (nd["lo"] > 0 or nd["hi"] < 0):
+            md += [
+                "**This interval contains zero.** The dip is real and statistically",
+                "significant in depth and in recovery time, but the *net time* a",
+                "single follower loses within 10 s is not distinguishable from zero.",
+                "The disturbance is sharp and brief, not a sustained loss.",
+                "",
+                "This is reported rather than omitted. Any claim that one lane change",
+                "costs the following vehicle measurable travel time is not supported",
+                "by this analysis. What is supported is that the *disturbance* is real",
+                "and that its size scales steeply with congestion — see the",
+                "regression below.",
+                "",
+            ]
 
     # --------------------------------------------------------- exposure ----
     exposure_path = p / "exposure.parquet"

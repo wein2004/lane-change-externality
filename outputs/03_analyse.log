@@ -31,6 +31,25 @@ Events analysed: **2,472**  ¡P  matched controls: **7,591**
 | Lighter traffic (>=25 km/h) | car | 1342 | 3.65 | 0.60 |
 | Lighter traffic (>=25 km/h) | truck | 32 | 2.75 | 0.00 |
 
+## How much time does the follower actually lose?
+
+`drop_kmh` above is the *depth* of the speed dip. This is its *area* ¡X
+seconds of delay accumulated over the 10 s after the manoeuvre,
+relative to holding the pre-event baseline speed.
+
+- Excess delay attributable to the lane change: **+0.03 s  (95% CI -0.25 .. +0.27), n=2472 vs 7591**
+
+**This interval contains zero.** The dip is real and statistically
+significant in depth and in recovery time, but the *net time* a
+single follower loses within 10 s is not distinguishable from zero.
+The disturbance is sharp and brief, not a sustained loss.
+
+This is reported rather than omitted. Any claim that one lane change
+costs the following vehicle measurable travel time is not supported
+by this analysis. What is supported is that the *disturbance* is real
+and that its size scales steeply with congestion ¡X see the
+regression below.
+
 ## How often does each class change lanes?
 
 The per-event penalty has a small truck sample. This does not ¡X it

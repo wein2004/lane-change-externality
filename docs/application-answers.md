@@ -3,22 +3,21 @@
 Draft answers. Limit is **200 words each**; counts are checked by
 `scripts/check_answer_length.py`.
 
-Anything in `[[double brackets]]` still needs your input.
-
 ---
 
 ## Q1. Describe one or two projects undertaken by your team members that relate to logistics, supply chain management, or data analytics.
 
 We built *The Externality of a Lane Change*, an open-source analysis of 8.7
 million vehicle-trajectory records from the US DOT's NGSIM programme: when a
-vehicle changes lanes, what does it cost the traffic behind it, and does a heavy
-goods vehicle cost more?
+vehicle changes lanes, what does it cost the traffic behind it, and does a
+truck cost more?
 
 We detected 2,472 clean lane changes, measured the follower's speed loss and
 recovery, and compared each against matched moments where no lane change
 occurred, paired on pre-event speed, acceleration trend and headway.
 
-We expected trucks to impose a larger cost. The data rejected it. Truck cut-ins cost the follower 1.62 km/h *less* than car cut-ins
+We expected trucks to impose a larger cost. The data rejected it. Truck cut-ins
+cost the follower 1.62 km/h *less* than car cut-ins
 (95% CI −3.12 to −0.02), and controlling for traffic state, vehicle class is
 indistinguishable from zero (p = 0.47). What survives is congestion: every
 1 km/h slower the surrounding traffic, the same manoeuvre costs 0.35 km/h more
@@ -27,22 +26,23 @@ indistinguishable from zero (p = 0.47). What survives is congestion: every
 Four data defects surfaced, one reversing the headline's sign; all documented
 publicly.
 
-We are two final-year Information Management students at NCCU — a discipline
-spanning systems and business — which is why this runs from raw trajectories
-through to a costed service concept, not just statistics.
+We are two final-year Information Management students at NCCU. One of us led the
+matched-control identification strategy, the other the service and commercial
+framing — so this runs from trajectories through to a costed service concept,
+not just statistics.
 
 ---
 
 ## Q2. Drawing on a project described above, how may it be packaged as a "service" and what may make the service "smart"?
 
-The finding productises directly as a **Congestion Externality Score** for
-fleet operators: an API that consumes the GPS traces operators already collect
-for compliance and insurance, and returns, per driver and per route, the delay
-their manoeuvres imposed on surrounding traffic.
+The finding productises as a **Congestion Externality Score** for fleet
+operators: an API consuming the GPS traces operators already collect for
+compliance and insurance, returning, per driver and per route, how much
+disturbance their manoeuvres imposed on surrounding traffic.
 
 Existing telematics scores — harsh braking, speeding, idling — all measure risk
-to the driver's *own* vehicle. None price the cost paid by everyone else. That
-cost is invisible to the driver, because it happens behind them.
+to the driver's *own* vehicle. None price the disturbance paid for by everyone
+else. It is invisible to the driver, because it happens behind them.
 
 Three things make it smart rather than merely automated.
 
