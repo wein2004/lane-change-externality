@@ -1,0 +1,66 @@
+# Results: the cost of one lane change, and who imposes more of it
+
+Events analysed: **2,472**  ¡P  matched controls: **7,591**
+
+## Q-A ¡X Is there a cost at all?
+
+- Follower speed drop after a lane change: **3.89 km/h**
+- Same statistic at matched no-lane-change moments: **3.13 km/h**
+- Attributable excess: **+0.76 km/h  (95% CI +0.44 .. +1.09), n=2472 vs 7591**
+
+- Excess recovery time: **+0.27 s  (95% CI +0.15 .. +0.40), n=2472 vs 7591**
+
+## Q-B ¡X Do trucks cost more than cars?
+
+- Truck-initiated lane change: **2.31 km/h** drop (n=54)
+- Car-initiated lane change:   **3.93 km/h** drop (n=2418)
+- Truck penalty: **-1.62 km/h  (95% CI -3.12 .. -0.02), n=54 vs 2418**
+- Truck penalty in recovery time: **-0.98 s  (95% CI -1.60 .. -0.30), n=54 vs 2418**
+
+## Q-C ¡X Does congestion amplify it?
+
+- **Heavy congestion (<25 km/h)**: truck penalty -2.60 km/h  (95% CI -4.33 .. -0.56), n=22 vs 1076
+- **Lighter traffic (>=25 km/h)**: truck penalty -0.90 km/h  (95% CI -3.15 .. +1.48), n=32 vs 1342
+
+### Absolute follower cost by regime and class
+
+| regime | class | n | mean drop (km/h) | median recovery (s) |
+|---|---|---:|---:|---:|
+| Heavy congestion (<25 km/h) | car | 1076 | 4.28 | 1.70 |
+| Heavy congestion (<25 km/h) | truck | 22 | 1.68 | 0.00 |
+| Lighter traffic (>=25 km/h) | car | 1342 | 3.65 | 0.60 |
+| Lighter traffic (>=25 km/h) | truck | 32 | 2.75 | 0.00 |
+
+## How often does each class change lanes?
+
+The per-event penalty has a small truck sample. This does not ¡X it
+uses every observed truck-second, not only the trucks that changed
+lanes.
+
+| class | vehicles | vehicle-hours | lane changes | changes / vehicle-hour |
+|---|---:|---:|---:|---:|
+| car | 11,324 | 226.4 | 2,418 | 10.68 |
+| motorcycle | 100 | 1.1 | 59 | 53.68 |
+| truck | 352 | 7.0 | 54 | 7.71 |
+
+Cars change lanes **1.4x** as often per hour as trucks.
+
+## Controlling for confounders
+
+A truck penalty could just reflect *where* and *when* trucks change
+lanes. This regression holds those constant.
+
+```
+===========================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                   2.3627      0.409      5.783      0.000       1.562       3.163
+is_truck                   -1.3643      1.880     -0.726      0.468      -5.048       2.320
+local_mean_kmh             -0.3511      0.020    -17.261      0.000      -0.391      -0.311
+is_truck:local_mean_kmh     0.0572      0.069      0.830      0.406      -0.078       0.192
+baseline_kmh                0.4695      0.018     26.231      0.000       0.434       0.505
+space_headway              -0.0347      0.003    -10.152      0.000      -0.041      -0.028
+site_c                     -3.2405      0.371     -8.725      0.000      -3.968      -2.513
+===========================================================================================
+```
+

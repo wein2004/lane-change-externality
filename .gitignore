@@ -1,0 +1,23 @@
+# Raw NGSIM data is large (~700MB) and publicly re-downloadable via scripts/01.
+data/raw/
+data/interim/
+*.parquet
+!data/processed/*.parquet
+
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+.DS_Store
+Thumbs.db
+
+# Local agent tooling, not part of the open-source project
+.claude/
+.claude-flow/
+.mcp.json
+
+# Private working notes and local agent config — not part of the open-source project
+require.md
+CLAUDE.md
