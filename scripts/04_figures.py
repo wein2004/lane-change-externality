@@ -173,9 +173,11 @@ def fig_cost_by_regime(events, controls, out: Path) -> None:
     ax.set_xticks(x, [REGIME_LABEL[r] for r in regimes])
     ax.set_ylabel("Follower speed drop (km/h)")
     ax.set_title("Cost imposed on the following vehicle, by traffic state",
-                 fontsize=12, pad=12, loc="left")
-    leg = ax.legend(frameon=False, ncol=3, loc="upper left",
-                    bbox_to_anchor=(0, 1.02))
+                 fontsize=12, pad=52, loc="left")
+    # Legend sits in its own band between the title and the plot, so a tall
+    # confidence interval can never collide with it.
+    leg = ax.legend(frameon=False, ncol=3, loc="lower left",
+                    bbox_to_anchor=(0, 1.0))
     for txt in leg.get_texts():
         txt.set_color(INK_2)
     ax.set_ylim(bottom=0)
