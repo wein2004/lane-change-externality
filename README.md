@@ -1,5 +1,7 @@
 # The Externality of a Lane Change
 
+[![tests](https://github.com/wein2004/lane-change-externality/actions/workflows/tests.yml/badge.svg)](https://github.com/wein2004/lane-change-externality/actions/workflows/tests.yml)
+
 **How much does one lane change cost the traffic behind it — and does it matter
 who makes it?**
 

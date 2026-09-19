@@ -1,0 +1,97 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly, to catch the US DOT API changing shape under us.
+    - cron: "17 4 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Everything that needs no network and no downloaded data. Fast and
+  # deterministic, so it gates every push.
+  checks:
+    name: logic and copy checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Detection logic (22 synthetic-trajectory checks)
+        run: python tests/test_detection.py
+
+      - name: Application answers within the 200-word limit
+        run: python scripts/check_answer_length.py
+
+      - name: Slide copy rules
+        run: python scripts/check_slide_copy.py
+
+      - name: Deck builds from its content module
+        run: |
+          python scripts/05_build_pptx.py --out /tmp/deck.pptx
+          python scripts/06_build_web_deck.py --out /tmp/webdeck
+
+  # The full pipeline hits the US DOT open data API, which is slow and outside
+  # our control, so it does not gate pushes. It runs weekly to catch the API
+  # changing shape under us, and on demand.
+  pipeline:
+    name: end-to-end on a data slice
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 400 vehicle_ids of I-80: enough to exercise every stage, small enough
+      # to stay inside a CI job.
+      - name: Download a slice
+        run: python scripts/01_download_ngsim.py --sites i-80 --max-vehicles 400
+
+      - name: Detect events and build matched controls
+        run: python scripts/02_detect_events.py --sites i-80
+
+      - name: Analyse
+        run: python scripts/03_analyse.py
+
+      - name: Figures
+        run: python scripts/04_figures.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-outputs
+          path: outputs/
+          retention-days: 14
