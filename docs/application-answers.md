@@ -10,29 +10,26 @@ Anything in `[[double brackets]]` still needs your input.
 ## Q1. Describe one or two projects undertaken by your team members that relate to logistics, supply chain management, or data analytics.
 
 We built *The Externality of a Lane Change*, an open-source analysis of 8.7
-million vehicle-trajectory records from the US DOT's NGSIM programme. It asks:
-when a vehicle changes lanes, what does it cost the traffic behind it, and does
-a heavy goods vehicle cost more?
+million vehicle-trajectory records from the US DOT's NGSIM programme: when a
+vehicle changes lanes, what does it cost the traffic behind it, and does a heavy
+goods vehicle cost more?
 
-We detected 2,472 clean lane changes, measured the following vehicle's speed
-loss and recovery time, and compared each against matched control moments where
-no lane change occurred — paired by nearest neighbour on pre-event speed,
-acceleration trend and headway.
+We detected 2,472 clean lane changes, measured the follower's speed loss and
+recovery, and compared each against matched moments where no lane change
+occurred, paired on pre-event speed, acceleration trend and headway.
 
-We committed to the hypothesis that trucks impose a larger cost. The data
-rejected it. Truck cut-ins cost the follower 1.62 km/h *less* than car cut-ins
-(95% CI −3.12 to −0.02), and once traffic state is controlled for, vehicle class
-is statistically indistinguishable from zero (p = 0.47). What survives is
-congestion: every 1 km/h slower the surrounding traffic, the identical manoeuvre
-costs 0.35 km/h more (p < 0.001). The externality belongs to the moment, not the
-vehicle.
+We expected trucks to impose a larger cost. The data rejected it. Truck cut-ins cost the follower 1.62 km/h *less* than car cut-ins
+(95% CI −3.12 to −0.02), and controlling for traffic state, vehicle class is
+indistinguishable from zero (p = 0.47). What survives is congestion: every
+1 km/h slower the surrounding traffic, the same manoeuvre costs 0.35 km/h more
+(p < 0.001). The externality belongs to the moment, not the vehicle.
 
-Four data defects surfaced, one reversing the headline's sign; all are
-documented in a public decision log.
+Four data defects surfaced, one reversing the headline's sign; all documented
+publicly.
 
-[[TEAM ROLES — one sentence, e.g. "A built the data pipeline, B designed the
-matched-control identification strategy, C developed the service and commercial
-framing." Replace with your real split.]]
+We are two final-year Information Management students at NCCU — a discipline
+spanning systems and business — which is why this runs from raw trajectories
+through to a costed service concept, not just statistics.
 
 ---
 
