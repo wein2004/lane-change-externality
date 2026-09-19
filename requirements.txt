@@ -1,7 +1,12 @@
+# Analysis pipeline
 pandas>=2.2
 numpy>=1.26
 pyarrow>=15.0
 requests>=2.31
-matplotlib>=3.8
 scipy>=1.11
 statsmodels>=0.14
+matplotlib>=3.8
+
+# Deck build (scripts/05_build_pptx.py)
+python-pptx>=1.0
+pillow>=10.0
